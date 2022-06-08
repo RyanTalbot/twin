@@ -7,6 +7,7 @@ import (
 	"os"
 	"strings"
 	"twin/internal/github"
+	"twin/internal/utils"
 	"twin/pkg/fileutil"
 	"twin/pkg/sysutil"
 )
@@ -23,23 +24,18 @@ func main() {
 
 	branchNamePointer := flag.String("branch", "", "The name of the branch you want")
 	outPointer := flag.String("out", "", "Destination path of the project")
-	shouldNotInitPointer := flag.Bool("no-init", false, "If set, will not auto init")
+	noInitPointer := flag.Bool("no-init", false, "If set, will not auto init")
 	flag.Parse()
 
 	tail := flag.Args()
 
-	if len(tail) == 0 {
-		fmt.Println("A GitHub URL must be specified")
-		return
-	}
-
-	repoURL := tail[0]
-	splitGitURL := strings.Split(repoURL, "/")
-	userName := splitGitURL[3]
-	repoName := splitGitURL[4]
+	source, _ := utils.SplitGitHubURL(tail)
+	repoURL := source["repoURL"]
+	userName := source["userName"]
+	repoName := source["repoName"]
 
 	if *outPointer == "" {
-		destinationPath = repoName
+		destinationPath = source["repoName"]
 	} else {
 		destinationPath = *outPointer
 	}
@@ -89,7 +85,7 @@ func main() {
 
 	defer os.RemoveAll(tempDir)
 
-	if gitInstalled && *shouldNotInitPointer == false {
+	if gitInstalled && *noInitPointer == false {
 		github.InitializeRepository(destinationPath)
 	}
 }
