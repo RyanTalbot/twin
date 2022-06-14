@@ -40,10 +40,11 @@ func Flags() (
 		}
 		flags["branchName"] = mainBranchName
 	} else {
-		existsBranch := github.VerifyBranchName(flags["userName"], flags["repoName"], *branchNamePointer)
+		existsBranch, err := github.VerifyBranchName(flags["userName"], flags["repoName"], *branchNamePointer)
 		if !existsBranch {
-			fmt.Printf("The branch %v not exists for repo %v\n", *branchNamePointer, flags["repoURL"])
-			os.Exit(1)
+			//fmt.Printf("The branch %v not exists for repo %v\n", *branchNamePointer, flags["repoURL"])
+			fmt.Println(err, *branchNamePointer, "not found in repo "+flags["repoURL"])
+			os.Exit(5)
 		}
 		flags["branchName"] = *branchNamePointer
 	}
